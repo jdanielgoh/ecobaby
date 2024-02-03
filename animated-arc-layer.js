@@ -35,6 +35,7 @@ color.a *= smoothstep(1.1 * w, w, abs(geometry.uv.y));
   }
 
   initializeState() {
+
     super.initializeState();
     this.getAttributeManager().addInstanced({
       instanceSourceTimestamp: {

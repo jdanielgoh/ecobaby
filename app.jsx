@@ -16,14 +16,14 @@ import RangeInput from './range-input';
 
 // Data source
 const DATA_URL =
-  'data/retiro-arribo.csv';
+  'https://raw.githubusercontent.com/jdanielgoh/ecobaby/main/data/retiro_arribo.csv';
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json';
 
 const INITIAL_VIEW_STATE = {
-  longitude: -40,
-  latitude: 40,
-  zoom: 2,
-  maxZoom: 6
+  longitude: -99.2,
+  latitude:19.4,
+  zoom: 12,
+  maxZoom: 20
 };
 
 /* eslint-disable react/no-deprecated */
@@ -40,7 +40,7 @@ export default function App({
     () => [
       new GeoJsonLayer({
         id: 'cities',
-        data: 'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_10m_populated_places_simple.geojson',
+        data: 'https://raw.githubusercontent.com/jdanielgoh/ecobaby/main/data/cicloestaciones.geojson',
 
         pointType: 'circle',
         pointRadiusUnits: 'pixels',
@@ -49,7 +49,7 @@ export default function App({
 
       new GeoJsonLayer({
         id: 'cities-highlight',
-        data: 'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_10m_populated_places_simple.geojson',
+        data: 'https://raw.githubusercontent.com/jdanielgoh/ecobaby/main/data/cicloestaciones.geojson',
 
         pointType: 'circle',
         pointRadiusUnits: 'common',
@@ -72,10 +72,10 @@ export default function App({
   const flightLayerProps = {
     data,
     greatCircle: true,
-    getSourcePosition: d => [d.lon1, d.lat1],
-    getTargetPosition: d => [d.lon2, d.lat2],
-    getSourceTimestamp: d => d.time1,
-    getTargetTimestamp: d => d.time2,
+    getSourcePosition: d => [d.r_lon, d.r_lat],
+    getTargetPosition: d => [d.a_lon, d.a_lat],
+    getSourceTimestamp: d => d.r_f/1000,
+    getTargetTimestamp: d => d.a_f/1000,
     getHeight: 0
   };
 
@@ -85,7 +85,7 @@ export default function App({
       ...flightLayerProps,
       id: 'flight-paths',
       timeRange: [currentTime - 600, currentTime], // 10 minutes
-      getWidth: 0.2,
+      getWidth: 20,
       widthMinPixels: 1,
       widthMaxPixels: 4,
       widthUnits: 'common',
@@ -99,7 +99,7 @@ export default function App({
     id: 'flight-mask',
     timeRange: [currentTime - timeWindow * 60, currentTime],
     operation: 'mask',
-    getWidth: 5000,
+    getWidth: 5,
     widthUnits: 'meters'
   });
 
@@ -115,7 +115,7 @@ export default function App({
       {data && (
         <RangeInput
           min={0}
-          max={86400}
+          max={2678386/1000}
           value={currentTime}
           animationSpeed={animationSpeed}
           formatLabel={formatTimeLabel}
