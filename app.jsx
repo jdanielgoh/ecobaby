@@ -1,3 +1,6 @@
+
+
+
 import React from 'react';
 import {useState, useMemo} from 'react';
 import {createRoot} from 'react-dom/client';
@@ -16,7 +19,7 @@ import RangeInput from './range-input';
 
 // Data source
 const DATA_URL =
-  'https://raw.githubusercontent.com/jdanielgoh/ecobaby/main/data/retiro_arribo.csv';
+'https://raw.githubusercontent.com/jdanielgoh/ecobaby/main/data/retiro_arribo.csv';
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json';
 
 const INITIAL_VIEW_STATE = {
@@ -55,15 +58,17 @@ export default function App({
         pointRadiusUnits: 'common',
         pointRadiusScale: 0.3,
         pointRadiusMinPixels: 2,
-        pointRadiusMaxPixels: 30,
+        pointRadiusMaxPixels: 10,
         getLineColor: [255, 232, 180, 90],
+        getFillColor: [255, 232, 180, 90],
+
         getLineWidth: 3,
         lineWidthUnits: 'pixels',
-        filled: false,
+        filled: true,
         stroked: true,
 
-        extensions: [new MaskExtension()],
-        maskId: 'flight-mask'
+        //extensions: [new MaskExtension()],
+        //maskId: 'flight-mask'
       })
     ],
     []
@@ -74,8 +79,8 @@ export default function App({
     greatCircle: true,
     getSourcePosition: d => [d.r_lon, d.r_lat],
     getTargetPosition: d => [d.a_lon, d.a_lat],
-    getSourceTimestamp: d => d.r_f/1000,
-    getTargetTimestamp: d => d.a_f/1000,
+    getSourceTimestamp: d => d.r_f,
+    getTargetTimestamp: d => d.a_f,
     getHeight: 0
   };
 
@@ -85,7 +90,7 @@ export default function App({
       ...flightLayerProps,
       id: 'flight-paths',
       timeRange: [currentTime - 600, currentTime], // 10 minutes
-      getWidth: 20,
+      getWidth: 0.2,
       widthMinPixels: 1,
       widthMaxPixels: 4,
       widthUnits: 'common',
@@ -99,7 +104,7 @@ export default function App({
     id: 'flight-mask',
     timeRange: [currentTime - timeWindow * 60, currentTime],
     operation: 'mask',
-    getWidth: 5,
+    getWidth: 5000,
     widthUnits: 'meters'
   });
 
@@ -108,14 +113,14 @@ export default function App({
       <DeckGL
         initialViewState={INITIAL_VIEW_STATE}
         controller={true}
-        layers={[flightPathsLayer, flightMaskLayer, citiesLayers]}
+        layers={[flightPathsLayer, citiesLayers]}
       >
         <Map reuseMaps mapLib={maplibregl} mapStyle={mapStyle} preventStyleDiffing={true} />
       </DeckGL>
       {data && (
         <RangeInput
           min={0}
-          max={2678386/1000}
+          max={86400}
           value={currentTime}
           animationSpeed={animationSpeed}
           formatLabel={formatTimeLabel}
@@ -138,6 +143,7 @@ export function renderToDOM(container) {
   root.render(<App />);
 
   load(DATA_URL, CSVLoader).then(flights => {
+    console.log(flights.map(d=>d))
     root.render(<App data={flights} showFlights />);
   });
 }
