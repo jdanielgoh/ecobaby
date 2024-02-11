@@ -19,8 +19,8 @@ import RangeInput from './range-input';
 
 // Data source
 const DATA_URL =
-'https://raw.githubusercontent.com/jdanielgoh/ecobaby/main/data/retiro_arribo.csv';
-const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json';
+'https://raw.githubusercontent.com/jdanielgoh/ecobaby/develop/data/retiro_arribo.csv';
+const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
 
 const INITIAL_VIEW_STATE = {
   longitude: -99.2,
@@ -34,21 +34,14 @@ export default function App({
   data,
   mapStyle = MAP_STYLE,
   showFlights = true,
-  timeWindow = 30,
-  animationSpeed = 3
+  timeWindow = 300,
+  animationSpeed = 50
 }) {
   const [currentTime, setCurrentTime] = useState(0);
 
   const citiesLayers = useMemo(
     () => [
-      new GeoJsonLayer({
-        id: 'cities',
-        data: 'https://raw.githubusercontent.com/jdanielgoh/ecobaby/main/data/cicloestaciones.geojson',
 
-        pointType: 'circle',
-        pointRadiusUnits: 'pixels',
-        getFillColor: [255, 232, 180]
-      }),
 
       new GeoJsonLayer({
         id: 'cities-highlight',
@@ -56,19 +49,18 @@ export default function App({
 
         pointType: 'circle',
         pointRadiusUnits: 'common',
-        pointRadiusScale: 0.3,
-        pointRadiusMinPixels: 2,
-        pointRadiusMaxPixels: 10,
-        getLineColor: [255, 232, 180, 90],
-        getFillColor: [255, 232, 180, 90],
+        pointRadiusScale: 0.2,
+        pointRadiusMinPixels: 1,
+        pointRadiusMaxPixels: 2,
+        getFillColor: [20, 20, 20, 90],
 
-        getLineWidth: 3,
+        getLineWidth: 1,
         lineWidthUnits: 'pixels',
         filled: true,
-        stroked: true,
+        stroked: false,
 
-        //extensions: [new MaskExtension()],
-        //maskId: 'flight-mask'
+        extensions: [new MaskExtension()],
+        maskId: 'flight-mask'
       })
     ],
     []
@@ -94,17 +86,17 @@ export default function App({
       widthMinPixels: 1,
       widthMaxPixels: 4,
       widthUnits: 'common',
-      getSourceColor: [180, 232, 255],
-      getTargetColor: [180, 232, 255],
-      parameters: {depthTest: false}
+      getSourceColor: [50, 154, 68],
+      getTargetColor: [0, 154, 68],
+      parameters: {depthTcitiesest: false}
     });
 
   const flightMaskLayer = new AnimatedArcLayer({
     ...flightLayerProps,
     id: 'flight-mask',
-    timeRange: [currentTime - timeWindow * 60, currentTime],
+    timeRange: [currentTime - timeWindow * 4, currentTime],
     operation: 'mask',
-    getWidth: 5000,
+    getWidth: 10,
     widthUnits: 'meters'
   });
 
@@ -120,7 +112,7 @@ export default function App({
       {data && (
         <RangeInput
           min={0}
-          max={86400}
+          max={2678386}
           value={currentTime}
           animationSpeed={animationSpeed}
           formatLabel={formatTimeLabel}
@@ -143,7 +135,6 @@ export function renderToDOM(container) {
   root.render(<App />);
 
   load(DATA_URL, CSVLoader).then(flights => {
-    console.log(flights.map(d=>d))
     root.render(<App data={flights} showFlights />);
   });
 }
